@@ -13,26 +13,9 @@ namespace MyBookStore
             //Skapa context objektet
             BookContext context = new BookContext();
 
-            string authorName = "Tolkien";
-
-            //Hämta books från DB
-            //List<Book> booksAvTolkien = context.Book.Where(m => m.Author.Name == authorName).ToList();
-            /*
-            //Hämta data från DB, med både BOoks och Athors
-            List<Book> booksAvTolkien = context.Book.Include(n => n.Author).Where(m => m.Author.Name == authorName).ToList();
-
-            foreach (Book book in booksAvTolkien)
-                Console.WriteLine("Booken {0} är skriven av {1}", book.Title, book.Author.Name);
-            */
-            //Hämta specifk book med info om författare samt alla böcker som författaren har skrivit.
-            string bookTitle = "Hobbit";
-
-            Book hobbitBook = context.Book.Include(m => m.Author).ThenInclude(n => n.Books).Where(o => o.Title == bookTitle).FirstOrDefault();
-
-            foreach(Book book in hobbitBook.Author.Books)
-            {
-                Console.WriteLine("{0} {1}", book.Title, book.Author.Name);
-            }
+            GetAllBooksFromSpecifikStore(context, "Biblioteket");
+            GetAllBooksFromSpecifikStore(context, "ICA");
+            GetAllBooksFromSpecifikStore(context, "Bookia");
 
 
         }
@@ -73,6 +56,44 @@ namespace MyBookStore
 
             //Spara ändringar
             context.SaveChanges();
+        }
+
+        static void GetBooksAndAuthorsInfo(BookContext context)
+        {
+            string authorName = "Tolkien";
+
+            //Hämta books från DB
+            //List<Book> booksAvTolkien = context.Book.Where(m => m.Author.Name == authorName).ToList();
+
+            //Hämta data från DB, med både BOoks och Athors
+            List<Book> booksAvTolkien = context.Book.Include(n => n.Author).Where(m => m.Author.Name == authorName).ToList();
+
+            foreach (Book book in booksAvTolkien)
+                Console.WriteLine("Booken {0} är skriven av {1}", book.Title, book.Author.Name);
+
+            //Hämta specifk book med info om författare samt alla böcker som författaren har skrivit.
+            string bookTitle = "Hobbit";
+
+            Book hobbitBook = context.Book.Include(m => m.Author).ThenInclude(n => n.Books).Where(o => o.Title == bookTitle).FirstOrDefault();
+
+            foreach (Book book in hobbitBook.Author.Books)
+            {
+                Console.WriteLine("{0} {1}", book.Title, book.Author.Name);
+            }
+        }
+
+        static void GetAllBooksFromSpecifikStore(BookContext context, string storeName)
+        {
+            Store store = context.Store
+                .Include(m => m.Books)
+                .ThenInclude(n => n.Book)
+                .Where(o => o.StoreName == storeName)
+                .FirstOrDefault();
+
+            foreach(BookStore bookStore in store.Books)
+            {
+                Console.WriteLine("I affären {0} finns boken {1}", store.StoreName, bookStore.Book.Title);
+            }
         }
     }
 }

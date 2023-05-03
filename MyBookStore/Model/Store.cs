@@ -7,15 +7,12 @@ using System.Threading.Tasks;
 
 namespace MyBookStore.Model
 {
-    internal class Book
+    internal class Store
     {
         [Key, Required]
         public int Id { get; set; }
         [Required]
-        public string? Title { get; set; }
-        public int Price { get; set; }
-        public Author Author { get; set; }
-        public ICollection<BookStore> Stores { get; set; }
-
+        public string? StoreName { get; set; }
+        public ICollection<BookStore> Books { get; set; }
     }
 }
